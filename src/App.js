@@ -30,6 +30,20 @@ function Board({ xIsNext, squares, onPlay }) {
     status = 'Next player: ' + (xIsNext ? 'X' : 'O');
   }
 
+  const boardRows = []; 
+  for (let row = 0; row < 3; row++) { 
+    const rowSquares = []; 
+    for (let col = 0; col < 3; col++) { 
+      const index = row * 3 + col; 
+      rowSquares.push( 
+        <Square key={index} value={squares[index]} onSquareClick={() => handleClick(index)} /> 
+      ); 
+    } 
+    boardRows.push( 
+      <div key={row} className="board-row"> {rowSquares} </div> 
+    ); 
+  }
+
   return (
     <>
       <div className="status">{status}</div>

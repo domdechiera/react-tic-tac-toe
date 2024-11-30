@@ -21,7 +21,7 @@ function Board({ xIsNext, squares, onPlay }) {
     } else {
       nextSquares[i] = 'O';
     }
-    onPlay(nextSquares);
+    onPlay(nextSquares, i);
   }
 
   const winner = calculateWinner(squares);
@@ -70,14 +70,20 @@ function Board({ xIsNext, squares, onPlay }) {
 // Game Component
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [locations, setLocations] = useState([]);
   const [currentMove, setCurrentMove] = useState(0);
   const [isAscending, setIsAscending] = useState(true);
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
 
-  function handlePlay(nextSquares) {
+  function handlePlay(nextSquares, location) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
+    const row = Math.floor(location / 3);
+    const col = location % 3;
+    const nextLocations = [...locations.slice(0, currentMove + 1), { row, col }];
+
     setHistory(nextHistory);
+    setLocations(nextLocations);
     setCurrentMove(nextHistory.length - 1);
   }
 
@@ -89,12 +95,14 @@ export default function Game() {
     setIsAscending(!isAscending);
   }
 
-  const moves = history.map((squares, move) => {
+  const moves = history.map((move) => {
     let description;
+
     if (currentMove === move) {
       description = 'You are at move #' + move;
     } else if (move > 0) {
-      description = 'Go to move #' + move;
+      const { row, col } = locations[move - 1];
+      description = `Go to move #${move} (${row}, ${col})`;
     } else {
       description = 'Go to game start';
     }
@@ -114,7 +122,11 @@ export default function Game() {
   return (
     <div className="game">
       <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        <Board 
+          xIsNext={xIsNext}
+          squares={currentSquares} 
+          onPlay={handlePlay}
+        />
       </div>
       <div className="game-info">
         <div className="sort-toggle">
